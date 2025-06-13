@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta name="generator" content="Hugo 0.147.8"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   
-    <title>Matteo Site</title>
+    <title>Prova_codice :: Matteo Site</title>
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="" />
-<meta name="keywords" content="" />
+<meta name="description" content=" #pragma once #include &lt;algorithm&gt; #include &lt;iostream&gt; #include &lt;stdexcept&gt; #include &lt;utility&gt; #include &lt;vector&gt; template &lt;typename Key, typename Val, int M&gt; class BTree { // M is the minimum degree of the B-tree. // Max keys in a node: 2*M - 1 // Min keys in a non-root node: M - 1 private: struct Node { bool is_leaf; std::vector&lt;Key&gt; keys; std::vector&lt;Val&gt; vals; std::vector&lt;Node *&gt; children; Node(bool leaf = false) : is_leaf(leaf) {} // NOTE: destructor called recursively ~Node() { for (Node *child : children) { delete child; } } }; Node *root = nullptr; int _size = 0; int _height = 0; int split_counter = 0; void _clear(Node *node) { if (node != nullptr) { delete node; // The destructor of sruct Node deletes children recursively } } // NOTE: Functions for search in this section Val *_search(Node *node, const Key &amp;k) { if (node == nullptr) { return nullptr; } // STL binary search to get first element &gt;= to k auto it = std::lower_bound(node-&gt;keys.begin(), node-&gt;keys.end(), k); // get index from iterator int i = std::distance(node-&gt;keys.begin(), it); // found k if (it != node-&gt;keys.end() &amp;&amp; *it == k) { return &amp;node-&gt;vals[i]; } if (node-&gt;is_leaf) { return nullptr; } return _search(node-&gt;children[i], k); } // NOTE: Functions for insertion in this section // // splits the child at `parent-&gt;children[child_index]` void _split_child(Node *parent, int child_index) { split_counter&#43;&#43;; Node *child_to_split = parent-&gt;children[child_index]; // create new sibling for splitting the node in half Node *new_child = new Node(child_to_split-&gt;is_leaf); // Promote the median key and value to the parent node parent-&gt;keys.insert(parent-&gt;keys.begin() &#43; child_index, child_to_split-&gt;keys[M - 1]); parent-&gt;vals.insert(parent-&gt;vals.begin() &#43; child_index, child_to_split-&gt;vals[M - 1]); // Put the sibling as a child of the parent // It will be the sibling to the right of the split node parent-&gt;children.insert(parent-&gt;children.begin() &#43; child_index &#43; 1, new_child); // move half of keys and values to the split node&#39;s sibling new_child-&gt;keys.assign(child_to_split-&gt;keys.begin() &#43; M, child_to_split-&gt;keys.end()); new_child-&gt;vals.assign(child_to_split-&gt;vals.begin() &#43; M, child_to_split-&gt;vals.end()); child_to_split-&gt;keys.resize(M - 1); child_to_split-&gt;vals.resize(M - 1); // if the split node was not a leaf, move its children into its new sibling if (!child_to_split-&gt;is_leaf) { new_child-&gt;children.assign(child_to_split-&gt;children.begin() &#43; M, child_to_split-&gt;children.end()); child_to_split-&gt;children.resize(M); } } // NOTE: IMPORTANT INVARIANT node should not be already full // otherwise it will overflow, only call this from public method void _insert_rec(Node *node, const Key &amp;k, const Val &amp;v) { // STL binary search to get index of first key &gt;= k auto it = std::lower_bound(node-&gt;keys.begin(), node-&gt;keys.end(), k); int i = std::distance(node-&gt;keys.begin(), it); // get index in vector of iterator it if (node-&gt;is_leaf) { // case where we found already existing key, update the val if (it != node-&gt;keys.end() &amp;&amp; *it == k) { node-&gt;vals[i] = v; return; } // regular case just insert the key in the leaf node-&gt;keys.insert(it, k); node-&gt;vals.insert(node-&gt;vals.begin() &#43; i, v); _size&#43;&#43;; } else { // case where we found already existing key, update the val, same as in // leaf if (it != node-&gt;keys.end() &amp;&amp; *it == k) { node-&gt;vals[i] = v; return; } // NOTE: important, guarantees that no node will overflow // splits the child we will visit recursively in case // it&#39;s already full if (node-&gt;children[i]-&gt;keys.size() == 2 * M - 1) { _split_child(node, i); // increase variabile i in case i need to go to the new sibling after // the split if (k &gt; node-&gt;keys[i]) { i&#43;&#43;; } } _insert_rec(node-&gt;children[i], k, v); } } // NOTE: Functions for deletion in this section std::pair&lt;Key, Val&gt; _get_pred(Node *node, int i) { Node *cur = node-&gt;children[i]; while (!cur-&gt;is_leaf) { cur = cur-&gt;children.back(); } return {cur-&gt;keys.back(), cur-&gt;vals.back()}; } std::pair&lt;Key, Val&gt; _get_succ(Node *node, int i) { Node *cur = node-&gt;children[i &#43; 1]; while (!cur-&gt;is_leaf) { cur = cur-&gt;children.front(); } return {cur-&gt;keys.front(), cur-&gt;vals.front()}; } void _borrow_from_prev(Node *node, int i) { Node *child = node-&gt;children[i]; Node *sibling = node-&gt;children[i - 1]; // take key from parent child-&gt;keys.insert(child-&gt;keys.begin(), node-&gt;keys[i - 1]); child-&gt;vals.insert(child-&gt;vals.begin(), node-&gt;vals[i - 1]); // eventually add children inherited from key taken from parent if (!child-&gt;is_leaf) { child-&gt;children.insert(child-&gt;children.begin(), sibling-&gt;children.back()); sibling-&gt;children.pop_back(); } node-&gt;keys[i - 1] = sibling-&gt;keys.back(); node-&gt;vals[i - 1] = sibling-&gt;vals.back(); sibling-&gt;keys.pop_back(); sibling-&gt;vals.pop_back(); } void _borrow_from_next(Node *node, int i) { Node *child = node-&gt;children[i]; Node *sibling = node-&gt;children[i &#43; 1]; child-&gt;keys.push_back(node-&gt;keys[i]); child-&gt;vals.push_back(node-&gt;vals[i]); if (!child-&gt;is_leaf) { child-&gt;children.push_back(sibling-&gt;children.front()); sibling-&gt;children.erase(sibling-&gt;children.begin()); } node-&gt;keys[i] = sibling-&gt;keys.front(); node-&gt;vals[i] = sibling-&gt;vals.front(); sibling-&gt;keys.erase(sibling-&gt;keys.begin()); sibling-&gt;vals.erase(sibling-&gt;vals.begin()); } void _merge(Node *node, int i) { Node *child = node-&gt;children[i]; Node *sibling = node-&gt;children[i &#43; 1]; child-&gt;keys.push_back(node-&gt;keys[i]); child-&gt;vals.push_back(node-&gt;vals[i]); child-&gt;keys.insert(child-&gt;keys.end(), sibling-&gt;keys.begin(), sibling-&gt;keys.end()); child-&gt;vals.insert(child-&gt;vals.end(), sibling-&gt;vals.begin(), sibling-&gt;vals.end()); if (!child-&gt;is_leaf) { child-&gt;children.insert(child-&gt;children.end(), sibling-&gt;children.begin(), sibling-&gt;children.end()); sibling-&gt;children.clear(); // Important: prevent double deletion } node-&gt;keys.erase(node-&gt;keys.begin() &#43; i); node-&gt;vals.erase(node-&gt;vals.begin() &#43; i); node-&gt;children.erase(node-&gt;children.begin() &#43; i &#43; 1); delete sibling; } void _fill(Node *node, int i) { // if i can borrow from left sibling if (i != 0 &amp;&amp; node-&gt;children[i - 1]-&gt;keys.size() &gt;= M) { _borrow_from_prev(node, i); // if i can borrow from right sibling } else if (i != node-&gt;keys.size() &amp;&amp; node-&gt;children[i &#43; 1]-&gt;keys.size() &gt;= M) { _borrow_from_next(node, i); // if i cannot borrow i need to merge the siblings into a node } else { if (i != node-&gt;keys.size()) { _merge(node, i); } else { _merge(node, i - 1); } } } void _remove_in_leaf(Node *node, int i) { node-&gt;keys.erase(node-&gt;keys.begin() &#43; i); node-&gt;vals.erase(node-&gt;vals.begin() &#43; i); _size--; } void _remove_in_internal(Node *node, int i) { Key k = node-&gt;keys[i]; if (node-&gt;children[i]-&gt;keys.size() &gt;= M) { auto [pred_key, pred_val] = _get_pred(node, i); node-&gt;keys[i] = pred_key; node-&gt;vals[i] = pred_val; _remove(node-&gt;children[i], pred_key); } else if (node-&gt;children[i &#43; 1]-&gt;keys.size() &gt;= M) { auto [succ_key, succ_val] = _get_succ(node, i); node-&gt;keys[i] = succ_key; node-&gt;vals[i] = succ_val; _remove(node-&gt;children[i &#43; 1], succ_key); } else { _merge(node, i); _remove(node-&gt;children[i], k); } } void _remove(Node *node, const Key &amp;k) { // STL binary search to get index of first key &gt;= k auto it = std::lower_bound(node-&gt;keys.begin(), node-&gt;keys.end(), k); int i = std::distance(node-&gt;keys.begin(), it); if (i &lt; node-&gt;keys.size() &amp;&amp; node-&gt;keys[i] == k) { if (node-&gt;is_leaf) { _remove_in_leaf(node, i); } else { _remove_in_internal(node, i); } } else { if (node-&gt;is_leaf) { return; // key not found nothing is removed } bool is_last_child = (i == node-&gt;keys.size()); // to keep invariant about minimum number of keys // in a node is &gt;= M-1 if (node-&gt;children[i]-&gt;keys.size() &lt; M) { _fill(node, i); } if (is_last_child &amp;&amp; i &gt; node-&gt;keys.size()) { _remove(node-&gt;children[i - 1], k); } else { _remove(node-&gt;children[i], k); } } } // NOTE: other functions not related to search, insertio and removal in this // section void _inorder(Node *node, std::vector&lt;std::pair&lt;Key, Val&gt;&gt; &amp;v) const { if (node == nullptr) return; int i; for (i = 0; i &lt; node-&gt;keys.size(); i&#43;&#43;) { if (!node-&gt;is_leaf) { _inorder(node-&gt;children[i], v); } v.push_back(std::make_pair(node-&gt;keys[i], node-&gt;vals[i])); } if (!node-&gt;is_leaf) { _inorder(node-&gt;children[i], v); } } // NOTE: only used for testing the actual height // computation dont use this, it&#39;s super naive int _height_naive(Node *node) const { if (node == nullptr) { return -1; } if (node-&gt;is_leaf) { return 0; } int max_child_height = -1; for (Node *child : node-&gt;children) { int child_height = _height_naive(child); max_child_height = std::max(max_child_height, child_height); } return 1 &#43; max_child_height; } public: BTree() { root = new Node(true); } ~BTree() { _clear(root); } int size() const { return _size; } bool empty() const { return _size == 0; } void insert(const Key &amp;k, const Val &amp;v) { split_counter = 0; Node *r = root; // if root is full make a new one with old root as child if (r-&gt;keys.size() == 2 * M - 1) { Node *s = new Node(); root = s; s-&gt;children.push_back(r); _split_child(s, 0); &#43;&#43;_height; _insert_rec(s, k, v); } else { _insert_rec(r, k, v); } } void remove(const Key &amp;k) { if (!root) { return; } _remove(root, k); // NOTE: case where we need to shrink tree height by 1 if (root-&gt;keys.empty() &amp;&amp; !root-&gt;is_leaf) { Node *old_root = root; root = root-&gt;children[0]; old_root-&gt;children .clear(); // Prevent destructor from deleting the new root delete old_root; --_height; } } Val &amp;search(const Key &amp;k) { Val *result = _search(root, k); if (result == nullptr) { throw std::runtime_error(&#34;Key not found&#34;); } return *result; } const Val &amp;search(const Key &amp;k) const { Val *result = _search(root, k); if (result == nullptr) { throw std::runtime_error(&#34;Key not found&#34;); } return *result; } bool contains(const Key &amp;k) { return _search(root, k) != nullptr; } void inorder_vector(std::vector&lt;std::pair&lt;Key, Val&gt;&gt; &amp;v) const { v.clear(); _inorder(root, v); } int height() const { return _height; } int last_insert_splits() const { return split_counter; } void clear() { _clear(root); root = new Node(true); _size = 0; } // NOTE: only used for testing the actual height // computation dont use this, it&#39;s super naive int _height_naive() { return _height_naive(root); } }; " />
+<meta name="keywords" content=", " />
 
   <meta name="robots" content="noodp" />
 
-<link rel="canonical" href="http://localhost:1313/" />
+<link rel="canonical" href="http://localhost:1313/posts/prova_codice/" />
 
 
 
@@ -72,22 +71,24 @@
 
 
 <meta property="og:locale" content="en" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Matteo Site">
-<meta property="og:description" content="" />
-<meta property="og:url" content="http://localhost:1313/" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Prova_codice">
+<meta property="og:description" content=" #pragma once #include &lt;algorithm&gt; #include &lt;iostream&gt; #include &lt;stdexcept&gt; #include &lt;utility&gt; #include &lt;vector&gt; template &lt;typename Key, typename Val, int M&gt; class BTree { // M is the minimum degree of the B-tree. // Max keys in a node: 2*M - 1 // Min keys in a non-root node: M - 1 private: struct Node { bool is_leaf; std::vector&lt;Key&gt; keys; std::vector&lt;Val&gt; vals; std::vector&lt;Node *&gt; children; Node(bool leaf = false) : is_leaf(leaf) {} // NOTE: destructor called recursively ~Node() { for (Node *child : children) { delete child; } } }; Node *root = nullptr; int _size = 0; int _height = 0; int split_counter = 0; void _clear(Node *node) { if (node != nullptr) { delete node; // The destructor of sruct Node deletes children recursively } } // NOTE: Functions for search in this section Val *_search(Node *node, const Key &amp;k) { if (node == nullptr) { return nullptr; } // STL binary search to get first element &gt;= to k auto it = std::lower_bound(node-&gt;keys.begin(), node-&gt;keys.end(), k); // get index from iterator int i = std::distance(node-&gt;keys.begin(), it); // found k if (it != node-&gt;keys.end() &amp;&amp; *it == k) { return &amp;node-&gt;vals[i]; } if (node-&gt;is_leaf) { return nullptr; } return _search(node-&gt;children[i], k); } // NOTE: Functions for insertion in this section // // splits the child at `parent-&gt;children[child_index]` void _split_child(Node *parent, int child_index) { split_counter&#43;&#43;; Node *child_to_split = parent-&gt;children[child_index]; // create new sibling for splitting the node in half Node *new_child = new Node(child_to_split-&gt;is_leaf); // Promote the median key and value to the parent node parent-&gt;keys.insert(parent-&gt;keys.begin() &#43; child_index, child_to_split-&gt;keys[M - 1]); parent-&gt;vals.insert(parent-&gt;vals.begin() &#43; child_index, child_to_split-&gt;vals[M - 1]); // Put the sibling as a child of the parent // It will be the sibling to the right of the split node parent-&gt;children.insert(parent-&gt;children.begin() &#43; child_index &#43; 1, new_child); // move half of keys and values to the split node&#39;s sibling new_child-&gt;keys.assign(child_to_split-&gt;keys.begin() &#43; M, child_to_split-&gt;keys.end()); new_child-&gt;vals.assign(child_to_split-&gt;vals.begin() &#43; M, child_to_split-&gt;vals.end()); child_to_split-&gt;keys.resize(M - 1); child_to_split-&gt;vals.resize(M - 1); // if the split node was not a leaf, move its children into its new sibling if (!child_to_split-&gt;is_leaf) { new_child-&gt;children.assign(child_to_split-&gt;children.begin() &#43; M, child_to_split-&gt;children.end()); child_to_split-&gt;children.resize(M); } } // NOTE: IMPORTANT INVARIANT node should not be already full // otherwise it will overflow, only call this from public method void _insert_rec(Node *node, const Key &amp;k, const Val &amp;v) { // STL binary search to get index of first key &gt;= k auto it = std::lower_bound(node-&gt;keys.begin(), node-&gt;keys.end(), k); int i = std::distance(node-&gt;keys.begin(), it); // get index in vector of iterator it if (node-&gt;is_leaf) { // case where we found already existing key, update the val if (it != node-&gt;keys.end() &amp;&amp; *it == k) { node-&gt;vals[i] = v; return; } // regular case just insert the key in the leaf node-&gt;keys.insert(it, k); node-&gt;vals.insert(node-&gt;vals.begin() &#43; i, v); _size&#43;&#43;; } else { // case where we found already existing key, update the val, same as in // leaf if (it != node-&gt;keys.end() &amp;&amp; *it == k) { node-&gt;vals[i] = v; return; } // NOTE: important, guarantees that no node will overflow // splits the child we will visit recursively in case // it&#39;s already full if (node-&gt;children[i]-&gt;keys.size() == 2 * M - 1) { _split_child(node, i); // increase variabile i in case i need to go to the new sibling after // the split if (k &gt; node-&gt;keys[i]) { i&#43;&#43;; } } _insert_rec(node-&gt;children[i], k, v); } } // NOTE: Functions for deletion in this section std::pair&lt;Key, Val&gt; _get_pred(Node *node, int i) { Node *cur = node-&gt;children[i]; while (!cur-&gt;is_leaf) { cur = cur-&gt;children.back(); } return {cur-&gt;keys.back(), cur-&gt;vals.back()}; } std::pair&lt;Key, Val&gt; _get_succ(Node *node, int i) { Node *cur = node-&gt;children[i &#43; 1]; while (!cur-&gt;is_leaf) { cur = cur-&gt;children.front(); } return {cur-&gt;keys.front(), cur-&gt;vals.front()}; } void _borrow_from_prev(Node *node, int i) { Node *child = node-&gt;children[i]; Node *sibling = node-&gt;children[i - 1]; // take key from parent child-&gt;keys.insert(child-&gt;keys.begin(), node-&gt;keys[i - 1]); child-&gt;vals.insert(child-&gt;vals.begin(), node-&gt;vals[i - 1]); // eventually add children inherited from key taken from parent if (!child-&gt;is_leaf) { child-&gt;children.insert(child-&gt;children.begin(), sibling-&gt;children.back()); sibling-&gt;children.pop_back(); } node-&gt;keys[i - 1] = sibling-&gt;keys.back(); node-&gt;vals[i - 1] = sibling-&gt;vals.back(); sibling-&gt;keys.pop_back(); sibling-&gt;vals.pop_back(); } void _borrow_from_next(Node *node, int i) { Node *child = node-&gt;children[i]; Node *sibling = node-&gt;children[i &#43; 1]; child-&gt;keys.push_back(node-&gt;keys[i]); child-&gt;vals.push_back(node-&gt;vals[i]); if (!child-&gt;is_leaf) { child-&gt;children.push_back(sibling-&gt;children.front()); sibling-&gt;children.erase(sibling-&gt;children.begin()); } node-&gt;keys[i] = sibling-&gt;keys.front(); node-&gt;vals[i] = sibling-&gt;vals.front(); sibling-&gt;keys.erase(sibling-&gt;keys.begin()); sibling-&gt;vals.erase(sibling-&gt;vals.begin()); } void _merge(Node *node, int i) { Node *child = node-&gt;children[i]; Node *sibling = node-&gt;children[i &#43; 1]; child-&gt;keys.push_back(node-&gt;keys[i]); child-&gt;vals.push_back(node-&gt;vals[i]); child-&gt;keys.insert(child-&gt;keys.end(), sibling-&gt;keys.begin(), sibling-&gt;keys.end()); child-&gt;vals.insert(child-&gt;vals.end(), sibling-&gt;vals.begin(), sibling-&gt;vals.end()); if (!child-&gt;is_leaf) { child-&gt;children.insert(child-&gt;children.end(), sibling-&gt;children.begin(), sibling-&gt;children.end()); sibling-&gt;children.clear(); // Important: prevent double deletion } node-&gt;keys.erase(node-&gt;keys.begin() &#43; i); node-&gt;vals.erase(node-&gt;vals.begin() &#43; i); node-&gt;children.erase(node-&gt;children.begin() &#43; i &#43; 1); delete sibling; } void _fill(Node *node, int i) { // if i can borrow from left sibling if (i != 0 &amp;&amp; node-&gt;children[i - 1]-&gt;keys.size() &gt;= M) { _borrow_from_prev(node, i); // if i can borrow from right sibling } else if (i != node-&gt;keys.size() &amp;&amp; node-&gt;children[i &#43; 1]-&gt;keys.size() &gt;= M) { _borrow_from_next(node, i); // if i cannot borrow i need to merge the siblings into a node } else { if (i != node-&gt;keys.size()) { _merge(node, i); } else { _merge(node, i - 1); } } } void _remove_in_leaf(Node *node, int i) { node-&gt;keys.erase(node-&gt;keys.begin() &#43; i); node-&gt;vals.erase(node-&gt;vals.begin() &#43; i); _size--; } void _remove_in_internal(Node *node, int i) { Key k = node-&gt;keys[i]; if (node-&gt;children[i]-&gt;keys.size() &gt;= M) { auto [pred_key, pred_val] = _get_pred(node, i); node-&gt;keys[i] = pred_key; node-&gt;vals[i] = pred_val; _remove(node-&gt;children[i], pred_key); } else if (node-&gt;children[i &#43; 1]-&gt;keys.size() &gt;= M) { auto [succ_key, succ_val] = _get_succ(node, i); node-&gt;keys[i] = succ_key; node-&gt;vals[i] = succ_val; _remove(node-&gt;children[i &#43; 1], succ_key); } else { _merge(node, i); _remove(node-&gt;children[i], k); } } void _remove(Node *node, const Key &amp;k) { // STL binary search to get index of first key &gt;= k auto it = std::lower_bound(node-&gt;keys.begin(), node-&gt;keys.end(), k); int i = std::distance(node-&gt;keys.begin(), it); if (i &lt; node-&gt;keys.size() &amp;&amp; node-&gt;keys[i] == k) { if (node-&gt;is_leaf) { _remove_in_leaf(node, i); } else { _remove_in_internal(node, i); } } else { if (node-&gt;is_leaf) { return; // key not found nothing is removed } bool is_last_child = (i == node-&gt;keys.size()); // to keep invariant about minimum number of keys // in a node is &gt;= M-1 if (node-&gt;children[i]-&gt;keys.size() &lt; M) { _fill(node, i); } if (is_last_child &amp;&amp; i &gt; node-&gt;keys.size()) { _remove(node-&gt;children[i - 1], k); } else { _remove(node-&gt;children[i], k); } } } // NOTE: other functions not related to search, insertio and removal in this // section void _inorder(Node *node, std::vector&lt;std::pair&lt;Key, Val&gt;&gt; &amp;v) const { if (node == nullptr) return; int i; for (i = 0; i &lt; node-&gt;keys.size(); i&#43;&#43;) { if (!node-&gt;is_leaf) { _inorder(node-&gt;children[i], v); } v.push_back(std::make_pair(node-&gt;keys[i], node-&gt;vals[i])); } if (!node-&gt;is_leaf) { _inorder(node-&gt;children[i], v); } } // NOTE: only used for testing the actual height // computation dont use this, it&#39;s super naive int _height_naive(Node *node) const { if (node == nullptr) { return -1; } if (node-&gt;is_leaf) { return 0; } int max_child_height = -1; for (Node *child : node-&gt;children) { int child_height = _height_naive(child); max_child_height = std::max(max_child_height, child_height); } return 1 &#43; max_child_height; } public: BTree() { root = new Node(true); } ~BTree() { _clear(root); } int size() const { return _size; } bool empty() const { return _size == 0; } void insert(const Key &amp;k, const Val &amp;v) { split_counter = 0; Node *r = root; // if root is full make a new one with old root as child if (r-&gt;keys.size() == 2 * M - 1) { Node *s = new Node(); root = s; s-&gt;children.push_back(r); _split_child(s, 0); &#43;&#43;_height; _insert_rec(s, k, v); } else { _insert_rec(r, k, v); } } void remove(const Key &amp;k) { if (!root) { return; } _remove(root, k); // NOTE: case where we need to shrink tree height by 1 if (root-&gt;keys.empty() &amp;&amp; !root-&gt;is_leaf) { Node *old_root = root; root = root-&gt;children[0]; old_root-&gt;children .clear(); // Prevent destructor from deleting the new root delete old_root; --_height; } } Val &amp;search(const Key &amp;k) { Val *result = _search(root, k); if (result == nullptr) { throw std::runtime_error(&#34;Key not found&#34;); } return *result; } const Val &amp;search(const Key &amp;k) const { Val *result = _search(root, k); if (result == nullptr) { throw std::runtime_error(&#34;Key not found&#34;); } return *result; } bool contains(const Key &amp;k) { return _search(root, k) != nullptr; } void inorder_vector(std::vector&lt;std::pair&lt;Key, Val&gt;&gt; &amp;v) const { v.clear(); _inorder(root, v); } int height() const { return _height; } int last_insert_splits() const { return split_counter; } void clear() { _clear(root); root = new Node(true); _size = 0; } // NOTE: only used for testing the actual height // computation dont use this, it&#39;s super naive int _height_naive() { return _height_naive(root); } }; " />
+<meta property="og:url" content="http://localhost:1313/posts/prova_codice/" />
 <meta property="og:site_name" content="Matteo Site" />
 
-  <meta property="og:image" content="http://localhost:1313/og-image.png">
+  
+  
+  <meta property="og:image" content="http://localhost:1313/">
 
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="627">
 
 
+  <meta property="article:published_time" content="2025-06-13 23:34:39 &#43;0200 CEST" />
 
 
 
-  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Matteo Site" />
 
 
 
@@ -122,41 +123,28 @@
 
   <div class="content">
     
+<article class="post">
+  <h1 class="post-title">
+    <a href="http://localhost:1313/posts/prova_codice/">Prova_codice</a>
+  </h1>
+  <div class="post-meta"><time class="post-date">2025-06-13</time></div>
+
   
-  <div class="posts">
-    
-    
-
-    
-    
+    <span class="post-tags">
       
-    
-    
-
-    
-      <article class="post on-list">
-        <h2 class="post-title">
-          <a href="http://localhost:1313/posts/prova_codice/">Prova_codice</a>
-        </h2>
-
-        <div class="post-meta"><time class="post-date">2025-06-13</time></div>
-
-        
-          <span class="post-tags">
-            
-            #<a href="http://localhost:1313/tags/"></a>&nbsp;
-            
-            #<a href="http://localhost:1313/tags/"></a>&nbsp;
-            
-          </span>
-        
-
-        
+      #<a href="http://localhost:1313/tags/"></a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/"></a>&nbsp;
+      
+    </span>
+  
+  
 
 
-        <div class="post-content">
-          
-            <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>
+  
+
+  <div class="post-content"><div>
+        <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">#pragma once
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;algorithm&gt;</span><span style="color:#75715e">
@@ -584,51 +572,15 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">_height_naive</span>() { <span style="color:#66d9ef">return</span> _height_naive(root); }
 </span></span><span style="display:flex;"><span>};
 </span></span></code></pre></div>
-          
-        </div>
+      </div></div>
 
-        
-          <div>
-            <a class="read-more button inline" href="/posts/prova_codice/">[]</a>
-          </div>
-        
-      </article>
-    
-      <article class="post on-list">
-        <h2 class="post-title">
-          <a href="http://localhost:1313/posts/prova/">prova</a>
-        </h2>
+  
 
-        <div class="post-meta"><time class="post-date">2025-06-12</time></div>
-
-        
-
-        
-
-
-        <div class="post-content">
-          
-            <p>Pagina di prova! Vediamo se funziona 😳</p>
-          
-        </div>
-
-        
-          <div>
-            <a class="read-more button inline" href="/posts/prova/">[]</a>
-          </div>
-        
-      </article>
+  
     
 
-    <div class="pagination">
-  <div class="pagination__buttons">
-    
-    
-    
-  </div>
-</div>
-
-  </div>
+  
+</article>
 
   </div>
 
