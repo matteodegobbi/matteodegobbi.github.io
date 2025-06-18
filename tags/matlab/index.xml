@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Matlab on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/tags/matlab/</link><description>Recent content in Matlab on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 18 Jun 2025 00:51:54 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/tags/matlab/index.xml" rel="self" type="application/rss+xml"/><item><title>Paper on Insect Species and Genus Classification 🐝🐞🐛</title><link>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</link><pubDate>Wed, 18 Jun 2025 00:51:54 +0200</pubDate><guid>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/img.png" alt="Featured image of post Paper on Insect Species and Genus Classification 🐝🐞🐛" />&lt;p>In February of this year we published a &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
+>paper&lt;/a> on undescribed Insect species and genus classification using DNA and image data.&lt;/p>
+&lt;p>My main contributions, together with Roger, were:&lt;/p>
+&lt;ul>
+&lt;li>ReACGAN for image feature extraction&lt;/li>
+&lt;li>CNN model with vertical kernels for DNA feature extraction&lt;/li>
+&lt;li>Compiling of finetuning dataset for the ReACGAN and CNN, scraping data from BOLDSystemsV3. (Image+DNA)&lt;/li>
+&lt;li>Compiling of pretraining dataset for the ReACGAN, merging previous datasets. (Only Image)&lt;/li>
+&lt;li>Replicating a previous study on the new dataset, since the dataset of the original paper is not publicly available&lt;/li>
+&lt;/ul>
+&lt;p>The finetuning dataset can be found at: &lt;a class="link" href="https://zenodo.org/records/14277812" target="_blank" rel="noopener"
+>https://zenodo.org/records/14277812&lt;/a>&lt;br>
+The pretraining dataset can be found at: &lt;a class="link" href="https://zenodo.org/records/14577906" target="_blank" rel="noopener"
+>https://zenodo.org/records/14577906&lt;/a>&lt;br>
+The code can be found at: &lt;a class="link" href="https://github.com/matteodegobbi/InsectClassification" target="_blank" rel="noopener"
+>https://github.com/matteodegobbi/InsectClassification&lt;/a>&lt;br>
+Paper: &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
+>https://www.mdpi.com/1999-4893/18/2/105&lt;/a>\&lt;/p></description></item></channel></rss>

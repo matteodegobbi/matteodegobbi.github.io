@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Reinforcement Learning on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/categories/reinforcement-learning/</link><description>Recent content in Reinforcement Learning on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 15 Jun 2025 01:27:57 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/categories/reinforcement-learning/index.xml" rel="self" type="application/rss+xml"/><item><title>Cave Descent reinforcement learning game</title><link>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/img.png" alt="Featured image of post Cave Descent reinforcement learning game" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
+>HackUPC 2025&lt;/a>, an hackhathon organized by FIB in Barcelona.&lt;/p>
+&lt;p>Together with &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
+>Vojtěch&lt;/a>, we built a reinforcement learning agent that learns to play a game similar to Geometry Dash&amp;rsquo;s rocket section.
+The agent is trained using deep Q-Learning and we built the game using pygame.&lt;/p>
+&lt;p>Devpost: &lt;a class="link" href="https://devpost.com/software/rocket-deep-reinforcement-learning" target="_blank" rel="noopener"
+>https://devpost.com/software/rocket-deep-reinforcement-learning&lt;/a>&lt;br>
+Code: &lt;a class="link" href="https://github.com/matteodegobbi/CaveDescentRL" target="_blank" rel="noopener"
+>https://github.com/matteodegobbi/CaveDescentRL&lt;/a>&lt;br>
+Vojtěch&amp;rsquo;s webiste: &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
+>https://vojtechbestak.cz/&lt;/a>\&lt;/p></description></item></channel></rss>

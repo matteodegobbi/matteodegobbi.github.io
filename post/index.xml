@@ -1,4 +1,31 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/post/</link><description>Recent content in Posts on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 13 Jun 2025 23:34:39 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Prova_codice</title><link>https://matteodegobbi.github.io/p/prova_codice/</link><pubDate>Fri, 13 Jun 2025 23:34:39 +0200</pubDate><guid>https://matteodegobbi.github.io/p/prova_codice/</guid><description>&lt;div class="highlight">&lt;div class="chroma">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/post/</link><description>Recent content in Posts on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 18 Jun 2025 00:51:54 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Paper on Insect Species and Genus Classification 🐝🐞🐛</title><link>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</link><pubDate>Wed, 18 Jun 2025 00:51:54 +0200</pubDate><guid>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/img.png" alt="Featured image of post Paper on Insect Species and Genus Classification 🐝🐞🐛" />&lt;p>In February of this year we published a &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
+>paper&lt;/a> on undescribed Insect species and genus classification using DNA and image data.&lt;/p>
+&lt;p>My main contributions, together with Roger, were:&lt;/p>
+&lt;ul>
+&lt;li>ReACGAN for image feature extraction&lt;/li>
+&lt;li>CNN model with vertical kernels for DNA feature extraction&lt;/li>
+&lt;li>Compiling of finetuning dataset for the ReACGAN and CNN, scraping data from BOLDSystemsV3. (Image+DNA)&lt;/li>
+&lt;li>Compiling of pretraining dataset for the ReACGAN, merging previous datasets. (Only Image)&lt;/li>
+&lt;li>Replicating a previous study on the new dataset, since the dataset of the original paper is not publicly available&lt;/li>
+&lt;/ul>
+&lt;p>The finetuning dataset can be found at: &lt;a class="link" href="https://zenodo.org/records/14277812" target="_blank" rel="noopener"
+>https://zenodo.org/records/14277812&lt;/a>&lt;br>
+The pretraining dataset can be found at: &lt;a class="link" href="https://zenodo.org/records/14577906" target="_blank" rel="noopener"
+>https://zenodo.org/records/14577906&lt;/a>&lt;br>
+The code can be found at: &lt;a class="link" href="https://github.com/matteodegobbi/InsectClassification" target="_blank" rel="noopener"
+>https://github.com/matteodegobbi/InsectClassification&lt;/a>&lt;br>
+Paper: &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
+>https://www.mdpi.com/1999-4893/18/2/105&lt;/a>\&lt;/p></description></item><item><title>Cave Descent reinforcement learning game</title><link>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/img.png" alt="Featured image of post Cave Descent reinforcement learning game" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
+>HackUPC 2025&lt;/a>, an hackhathon organized by FIB in Barcelona.&lt;/p>
+&lt;p>Together with &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
+>Vojtěch&lt;/a>, we built a reinforcement learning agent that learns to play a game similar to Geometry Dash&amp;rsquo;s rocket section.
+The agent is trained using deep Q-Learning and we built the game using pygame.&lt;/p>
+&lt;p>Devpost: &lt;a class="link" href="https://devpost.com/software/rocket-deep-reinforcement-learning" target="_blank" rel="noopener"
+>https://devpost.com/software/rocket-deep-reinforcement-learning&lt;/a>&lt;br>
+Code: &lt;a class="link" href="https://github.com/matteodegobbi/CaveDescentRL" target="_blank" rel="noopener"
+>https://github.com/matteodegobbi/CaveDescentRL&lt;/a>&lt;br>
+Vojtěch&amp;rsquo;s webiste: &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
+>https://vojtechbestak.cz/&lt;/a>\&lt;/p></description></item><item><title>Prova_codice</title><link>https://matteodegobbi.github.io/p/prova_codice/</link><pubDate>Fri, 13 Jun 2025 23:34:39 +0200</pubDate><guid>https://matteodegobbi.github.io/p/prova_codice/</guid><description>&lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
 &lt;/span>&lt;span class="lnt"> 2
