@@ -1,4 +1,325 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/post/</link><description>Recent content in Posts on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 18 Jun 2025 00:51:54 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Paper on Insect Species and Genus Classification 🐝🐞🐛</title><link>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</link><pubDate>Wed, 18 Jun 2025 00:51:54 +0200</pubDate><guid>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/img.png" alt="Featured image of post Paper on Insect Species and Genus Classification 🐝🐞🐛" />&lt;p>In February of this year we published a &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/post/</link><description>Recent content in Posts on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 02 Aug 2025 18:19:21 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Dynamic Producer Consumer 📈📉</title><link>https://matteodegobbi.github.io/p/dynamic-producer-consumer/</link><pubDate>Sat, 02 Aug 2025 18:19:21 +0200</pubDate><guid>https://matteodegobbi.github.io/p/dynamic-producer-consumer/</guid><description>&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_1000_1000/prod_delay.png" alt="Featured image of post Dynamic Producer Consumer 📈📉" />&lt;h1 id="producer-consumer-problem-with-dynamic-rate-adjustment">Producer-Consumer problem with dynamic rate adjustment
+&lt;/h1>&lt;p>In this repo I implemented the producer consumer problem with dynamic rate
+adjustment carried out with an actor.&lt;/p>
+&lt;p>The consumer is a thread that consumes messages at a given fixed rate, that is, with a given delay from a shared buffer, simulating the consumed message usage.
+The producer is a thread that creates messages and writes them to a shared buffer, the rate of the producer is controlled by another thread called the actor.&lt;/p>
+&lt;p>An actor separate from producer and consumer periodically checks the message queue length and if the length is below a given threshold, it will increase the production rate. Otherwise (i.e. the message length is above the given threshold), it will decrease the production rate.
+In this case the message queue is implemented with a circular queue (or ring buffer).&lt;/p>
+&lt;hr>
+&lt;p>The main idea is to try to keep the buffer always half-full.
+Meaning the objective is to have buffer utilization always close to 50%, this leaves room in both ways:
+if the consumer is delayed we will still have room for inserting new data, and if the producer is delayed we still have data to consume for a while.
+This way it maximizes the production rate until the buffer utilization goes over 50%. Any other threshold could be chosen and the program still works (e.g. I tried also with 70%).&lt;/p>
+&lt;p>I tried two approaches, both inspired by control systems, the control is carried out by changing a delay in the producer thread, this will dynamically adjust the rate of the producer to try to keep the buffer utilization at 50%.&lt;/p>
+&lt;p>The two controllers are:&lt;/p>
+&lt;ol>
+&lt;li>A simple threshold based control system&lt;/li>
+&lt;li>A PID controller&lt;/li>
+&lt;/ol>
+&lt;p>Both systems share the code for the producer and the consumer.
+The actor that carries out the control is different in the two solutions.
+In both cases the actor runs at a fixed rate (e.g. every 1ms or 0.5ms etc.) and it checks the current buffer utilization, it then uses this information to adjust the producer&amp;rsquo;s rate.
+More information about the two methods will be given below.&lt;/p>
+&lt;p>It&amp;rsquo;s important to have the actor&amp;rsquo;s rate not too high or too low.
+If the delay is too high then the actor does not have time to react to changes
+in buffer utilization, leading to oscillations between the buffer being
+too full and too empty.
+Inversely if the delay is too small the actor will enter the critical
+section too often, making the producer and consumer wait
+to enter their critical section and degrading the perfomance of the two.&lt;/p>
+&lt;p>Unfortunately we cannot fix a rate for the actor for every task and every
+system and this will need to be tuned depending on the system used.&lt;/p>
+&lt;p>Another important detail is the length of the buffer:
+if the buffer is too small and the producer (or consumer) is carrying out
+some operation, the other thread will empty (or fill) the buffer and
+we don&amp;rsquo;t have enough room to provide some leeway for the two threads
+to do their work while the other one is waiting or performing some
+other operations, hampering the concurrency of the system.
+In most of my experiments I tried buffer sizes of 100000 and 1000000.
+This problem can be witnessed with a buffer size of just 1000 or 100
+the buffer utilization oscillates between 0% and 100%.
+The buffer length also influences at what rate we can run the actor,
+a bigger buffer allows us to run the actor less often, meaning the actor
+adds less overhead to the system.&lt;/p>
+&lt;hr>
+&lt;h2 id="control-methods">Control methods
+&lt;/h2>&lt;p>In this section I explain the two methods I implemented to try to maximize the production rate while keeping the buffer utilization under 50%.&lt;/p>
+&lt;h3 id="naive-threshold-based-method">Naive threshold based method
+&lt;/h3>&lt;p>The first method I implemented is called &lt;code>naive_actor&lt;/code> in the code and it loops over the following code:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pthread_mutex_lock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">mutex&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">writeIdx&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">readIdx&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">buffer_size&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">%&lt;/span> &lt;span class="n">buffer_size&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">float&lt;/span> &lt;span class="n">percent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">count&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">buffer_size&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">percent&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mf">0.45&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">*=&lt;/span> &lt;span class="mf">0.8&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// to avoid having delay==0
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="nf">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">percent&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mf">0.55&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">*=&lt;/span> &lt;span class="mf">1.2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mf">1e6&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="mf">1e6&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="n">producer_delay&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// clip if above 1s
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">last_delay&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">producer_delay&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pthread_mutex_unlock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">mutex&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>this is a very simple implementation that just check whether
+the percent utilization of the buffer has gone above 55% or
+below 45% and decreases or increases the producer&amp;rsquo;s rate by 20%.
+This approach is similar to bang-bang control in control theory
+since it only activates when it&amp;rsquo;s between two thresholds,
+in this case the output is like a binary on/off that either
+increases or decreases the delay by 20% independently of how far the
+buffer utilization is from 50%.&lt;/p>
+&lt;p>The producer delay is clipped to be 1 second at most, this is not necessary with the normal setup with fixed consumer
+delay but later I will explain a variation I tried where the consumer&amp;rsquo;s delay is generated by a Cauchy random variable
+and in this case this naive controller can be unstable and create high delays above 1 second in the producer.&lt;/p>
+&lt;p>When using the PID controller that I will explain later, this step is not needed, because even when the consumer&amp;rsquo;s delay is
+generated by a Cauchy r.v. the system is still stable without clipping.&lt;/p>
+&lt;p>In the figure below we can see how the naive controller performs,
+the buffer utilization reaches 50%, then it overshoots
+to ~57% and then starts oscillating between ~43% and ~57%,
+this is expected for two reasons:&lt;/p>
+&lt;ol>
+&lt;li>The controller only works if the utilization goes outside the range [0.45,0.55],&lt;/li>
+&lt;li>When it changes the delay it only reacts by changing it by a fixed percentage
+of the previous value. It does not use the distance from the target utilization
+or the rate of change of the error,
+meaning if the current utilization is 56% it will react in the same way if
+the previous utilization was 55% or if it was 90%. But it should react differently,
+if the previous utilization was 56% and it&amp;rsquo;s still 56% we probably need to increase the delay,
+but if it was 90% it means the consumer has increased its speed for whatever reason so
+we probably won&amp;rsquo;t need to increase the delay.&lt;/li>
+&lt;/ol>
+&lt;p>This 2nd point made me think if I can incorporate in some way the rate of change,
+and at this point I realized that I can use a PID controller, this way I can use the
+rate of change through the derivative and I can also tune the parameters more easily,
+since I just need to change 3 numbers.
+Also using a PID controller the proportional term will be proportional to the error
+reacting differently if the error is small or large, the naive controller always reacts
+at the same speed independently from the magnitude of the error.&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/naive/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/naive/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 1:&lt;/strong> Buffer utilization percentage and producer's delay when using the naive controller&lt;/figcaption>
+&lt;/figure>
+&lt;h3 id="pid-controller">PID controller
+&lt;/h3>&lt;p>To implement the PID controller I changed the actor code and made the function &lt;code>pid_actor&lt;/code> which changes the main loop to this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">float&lt;/span> &lt;span class="n">prev_error&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">float&lt;/span> &lt;span class="n">integral&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">keep_running&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pthread_mutex_lock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">mutex&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">writeIdx&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">readIdx&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">buffer_size&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">%&lt;/span> &lt;span class="n">buffer_size&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">float&lt;/span> &lt;span class="n">percent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">count&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">buffer_size&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">float&lt;/span> &lt;span class="n">error&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.50&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">percent&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">integral&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">error&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">float&lt;/span> &lt;span class="n">derivative&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">error&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">prev_error&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">float&lt;/span> &lt;span class="n">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">k_p&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">error&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">k_d&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">derivative&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">k_i&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">integral&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">prev_error&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">error&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="p">)(&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">producer_delay&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="n">producer_delay&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// clip if below 0
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">last_delay&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">producer_delay&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pthread_mutex_unlock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">mutex&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// write buffer utilization and producer delay rate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">fprintf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;%.2f,%d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">percent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">last_delay&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">usleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ACTOR_DELAY&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The actor computes the error as the difference between the 0.50 (the wanted buffer utilization) and the current buffer utilization.
+Then this error is used to compute the output of the controller that will be subtracted from the current delay in a feedback loop.
+We have that the output is made up of three terms:&lt;/p>
+&lt;ol>
+&lt;li>Proportional term which is proportional to the error itself, this is similar to the naive controller&lt;/li>
+&lt;li>Integrative term, which means proportional to the sum of past errors&lt;/li>
+&lt;li>Derivative term, meaning proportional to the difference between the current and previous error. (This is the part that incorporates the rate of change)&lt;/li>
+&lt;/ol>
+&lt;p>The multiplicative constants K_p,K_i,K_d are read from a configuration file.&lt;/p>
+&lt;p>In this case we don&amp;rsquo;t need to clip the delay to be below one second as the system is already stable, but we do need to clip it to not go below 0 as a negative delay makes no sense.&lt;/p>
+&lt;p>This PID actor works much better without oscillations and it just requires to try a few combinations of the parameters to work.
+Some values of K_p,K_i,K_d I found that work well are 1000,0,1000, 1000,0,10000 or 10000,0,10000.&lt;/p>
+&lt;p>The constant K_d of the derivative term has the effect of dampening oscillations and overshoots, but if it&amp;rsquo;s increased too much
+it can make the system too slow to react to changes of regimes and to initially reach the 50% utilization.&lt;/p>
+&lt;p>I found that the integral term is usually not needed as there isn&amp;rsquo;t a drift in time from the wanted output. The only set
+of parameters I found an instance in which the integral term helps:
+with K_p=100,K_d=10000 the system has a small steady state error
+so adding a small integral term of K_i=0.01 removes this steady state error at the cost of some oscillation. Since this
+steady state error can also be removed by increasing K_p without introducing oscillations I never wound up using the
+integral term but I left it implemented because in some systems it could be useful to counteract systemic noise.&lt;/p>
+&lt;p>This example of adding the effect of adding K_i=0.01 can be seen in the figure below.&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/integral_steady_state/1percent_utilization.png" alt="Image 1">
+&lt;figcaption>&lt;strong>Figure 2a:&lt;/strong> Buffer utilization percentage with PID controller and Kp=100,Ki=0,Kd=10000. We can notice that
+the steady state of utilization is slightly above 50%, around 51% and no oscillation occurs.
+&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/example_plots/integral_steady_state/2percent_utilization.png" alt="Image 1">
+&lt;figcaption>&lt;strong>Figure 2b:&lt;/strong> Buffer utilization percentage with PID controller and Kp=100,Ki=0.01,Kd=10000. We can notice that
+the utilization oscillates around 50%.
+&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/example_plots/integral_steady_state/3percent_utilization.png" alt="Image 1">
+&lt;figcaption>&lt;strong>Figure 2c:&lt;/strong> Buffer utilization percentage with PID controller and Kp=1000,Ki=0,Kd=10000, the system quickly reaches 50%
+utilization and does not oscillate.
+&lt;/figcaption>
+&lt;/figure>
+&lt;hr>
+&lt;p>Below I will show some plots when using the PID controller with different constants.&lt;/p>
+&lt;p>Firsty let&amp;rsquo;s see with just a proportional controller:&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_100_0/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_100_0/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 3:&lt;/strong> Buffer utilization percentage and producer's delay when using the PID controller
+with Kp=100,Ki=00,Kd=0, we have oscillations in both the utilization and the producer delay &lt;/figcaption>
+&lt;/figure>
+&lt;p>Since with just a proportional controller like in the previous figure there are oscillations
+we can try to add a derivative term to try to dampen the oscillations:&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_100_1000/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_100_1000/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 4:&lt;/strong> Buffer utilization percentage and producer's delay when using the PID controller with Kp=100,Ki=0,Kd=1000,
+the oscillations decrease in magnitude over time. Eventually the producer's delay matches the consumer's.
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>We can now try to increase Kp and/or Kd to try to see if we can get better outcomes in terms of reaching
+steady state faster and reducing overshoot and oscillations:&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_1000_1000/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_1000_1000/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 5:&lt;/strong> Buffer utilization percentage and producer's delay when using the PID controller with Kp=1000,Ki=0,Kd=1000,
+the overshoot is decreased and the systems reaches steady state quickly, still there are oscillations in the producer's delay.
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>To try to reduce the oscillations in the producer&amp;rsquo;s delay I finally increased both Kp and Kd to make the system settle fast
+but also reduce the oscillations in the controlling signal.&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_10000_10000/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/fixed_delay/pid_10000_10000/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 6:&lt;/strong> Buffer utilization percentage and producer's delay when using the PID controller with Kp=10000,Ki=0,Kd=10000,
+the utilization doesn't overshoot and reaches steady state quickly, the oscillations in the producer's delay happen only at the beginning and quickly go away.
+&lt;/figcaption>
+&lt;/figure>
+&lt;hr>
+&lt;h2 id="variable-rate-consumer-using-cauchy-distributed-random-delay">Variable rate consumer using Cauchy distributed random delay
+&lt;/h2>&lt;p>Finally I decided to see if the two systems can deal with a consumer that has a very variable
+rate, to do this is decided to generate the delay of the consumer with a Cauchy random variable with center 100 and scale
+parameter 100.&lt;/p>
+&lt;p>I choose a Cauchy rv because it has very high variability and is unpredictable, the median of this delay will still be 100 microseconds but
+much higher delays can be generated, still I clipped the delay to not be more than 1e6 microseconds (1 second) to avoid very long wait times.&lt;/p>
+&lt;p>Just to see how variable this delay is we can run this R script:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_gaussian&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">rnorm&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mean&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">sd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_cauchy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">rcauchy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">median&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_gaussian&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">median&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_cauchy&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">max&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_gaussian&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">max&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_cauchy&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>with a run of this script we get that the medians are 107.7077 for the gaussian and 106.806 for the Cauchy.
+But the maxes are very different: 475.0348 for the gaussian and 55947.0 for the Cauchy. And this is with only 1000 samples,
+increasing the number of samples would highlight the difference even further as Cauchy r.v.&amp;rsquo;s don&amp;rsquo;t have a finite variance.&lt;/p>
+&lt;p>So the system needs to be able to act quickly in order to counteract this kind of spikes in delays.&lt;/p>
+&lt;p>Now I will show some plots overviewing the behaviour of the two controllers when dealing with this Cauchy delay.&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/cauchy/naive_cauchy/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/cauchy/naive_cauchy/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 7:&lt;/strong> Buffer utilization percentage and producer's delay when using the naive controller, the consumer's delay
+is generated by a Cauchy r.v.
+&lt;/figcaption>
+&lt;/figure>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/example_plots/cauchy/pid_cauchy_10000_10000/percent_utilization.png" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/example_plots/cauchy/pid_cauchy_10000_10000/prod_delay.png" alt="Image 2">
+&lt;figcaption>&lt;strong>Figure 8:&lt;/strong> Buffer utilization percentage and producer's delay when using the PID controller with Kp=10000,Ki=0,Kd=10000,
+the consumer's delay is generated by a Cauchy r.v.
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>As we can see from the previous Figures 7 and 8 the two controllers exhibit very different behaviours.
+The naive controller goes from delay 0 to 10 seconds of delay (this is the reason why after I added the clipping to 1 second)
+in some systems (e.g. my laptop) this is very drastic and can hang the system for a long time, the buffer utilization is always between
+40% and 60% but it&amp;rsquo;s more unstable.&lt;/p>
+&lt;p>With the same setup the PID controller is much more stable having spikes only when the consumer has a long delay
+and quickly reaching 50% again by adjusting the producer rate. The controller also doesn&amp;rsquo;t reach very long delays as it can
+respond in a more stable manner, reaching at most 60000 microseconds delay against 1e7 microseconds (or more) of the naive controller.&lt;/p>
+&lt;hr>
+&lt;h2 id="how-to-run-the-experiments">How to run the experiments
+&lt;/h2>&lt;p>You need to have installed &lt;code>gcc&lt;/code> and &lt;code>make&lt;/code> in a POSIX compatible machine with pthreads (I tested the code on Ubuntu 24.04 LTS on a x86 machine and MacOS Sequoia 15.5 on a ARM machine)&lt;/p>
+&lt;p>For the plotting you need to have installed &lt;code>python&lt;/code> with the libraries &lt;code>pandas&lt;/code> and &lt;code>matplotlib&lt;/code>.&lt;/p>
+&lt;p>To run the experiment you can set the PID constants in the text config file &lt;code>pid_constants.txt&lt;/code> and run&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># to run with fixed delay&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">make run-and-plot &lt;span class="nv">MODE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># to run with Cauchy delay&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">make cauchy-run-and-plot &lt;span class="nv">MODE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The &lt;code>MODE&lt;/code> argument when set to 1 (default value) runs with the PID controller and when set to 0 runs with the naive controller.&lt;/p>
+&lt;p>To set the durations of the experiment or the buffer size you can change the Makefile.&lt;/p></description></item><item><title>Paper on Insect Species and Genus Classification 🐝🐞🐛</title><link>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</link><pubDate>Wed, 18 Jun 2025 00:51:54 +0200</pubDate><guid>https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/paper-on-insect-species-and-genus-classification/img.png" alt="Featured image of post Paper on Insect Species and Genus Classification 🐝🐞🐛" />&lt;p>In February of this year we published a &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
 >paper&lt;/a> on undescribed Insect species and genus classification using DNA and image data.&lt;/p>
 &lt;p>My main contributions, together with Roger, were:&lt;/p>
 &lt;ul>
@@ -885,4 +1206,4 @@ Vojtěch&amp;rsquo;s webiste: &lt;a class="link" href="https://vojtechbestak.cz/
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div></description></item><item><title>prova</title><link>https://matteodegobbi.github.io/p/prova/</link><pubDate>Thu, 12 Jun 2025 23:03:09 +0200</pubDate><guid>https://matteodegobbi.github.io/p/prova/</guid><description>&lt;p>Pagina di prova! Vediamo se funziona 😳&lt;/p></description></item><item><title>prova2</title><link>https://matteodegobbi.github.io/p/prova2/</link><pubDate>Sun, 12 Jun 2022 23:03:09 +0200</pubDate><guid>https://matteodegobbi.github.io/p/prova2/</guid><description>&lt;p>Pagina di prova! Vediamo se funziona 😳&lt;/p></description></item></channel></rss>
+&lt;/div></description></item><item><title>prova2</title><link>https://matteodegobbi.github.io/p/prova2/</link><pubDate>Sun, 12 Jun 2022 23:03:09 +0200</pubDate><guid>https://matteodegobbi.github.io/p/prova2/</guid><description>&lt;p>Pagina di prova! Vediamo se funziona 😳&lt;/p></description></item></channel></rss>
