@@ -15,14 +15,48 @@ The pretraining dataset can be found at: &lt;a class="link" href="https://zenodo
 The code can be found at: &lt;a class="link" href="https://github.com/matteodegobbi/InsectClassification" target="_blank" rel="noopener"
 >https://github.com/matteodegobbi/InsectClassification&lt;/a>&lt;br>
 Paper: &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
->https://www.mdpi.com/1999-4893/18/2/105&lt;/a>\&lt;/p></description></item><item><title>Cave Descent reinforcement learning game</title><link>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/img.png" alt="Featured image of post Cave Descent reinforcement learning game" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
+>https://www.mdpi.com/1999-4893/18/2/105&lt;/a>\&lt;/p></description></item><item><title>Reinforcement learning agent for Cave Descent game at HackUPC 2025</title><link>https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/img.png" alt="Featured image of post Reinforcement learning agent for Cave Descent game at HackUPC 2025" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
 >HackUPC 2025&lt;/a>, an hackhathon organized by FIB in Barcelona.&lt;/p>
 &lt;p>Together with &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
 >Vojtěch&lt;/a>, we built a reinforcement learning agent that learns to play a game similar to Geometry Dash&amp;rsquo;s rocket section.
 The agent is trained using deep Q-Learning and we built the game using pygame.&lt;/p>
+&lt;p>We managed to get in the top 5 and present our work in front of everyone 😁!&lt;/p>
 &lt;p>Devpost: &lt;a class="link" href="https://devpost.com/software/rocket-deep-reinforcement-learning" target="_blank" rel="noopener"
 >https://devpost.com/software/rocket-deep-reinforcement-learning&lt;/a>&lt;br>
 Code: &lt;a class="link" href="https://github.com/matteodegobbi/CaveDescentRL" target="_blank" rel="noopener"
 >https://github.com/matteodegobbi/CaveDescentRL&lt;/a>&lt;br>
 Vojtěch&amp;rsquo;s webiste: &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
->https://vojtechbestak.cz/&lt;/a>\&lt;/p></description></item></channel></rss>
+>https://vojtechbestak.cz/&lt;/a>\&lt;/p>
+&lt;figure>
+&lt;figcaption>Me and Vojtěch explaining our project&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/misc/hack.jpg" style="width:500px;" alt="Image 1">
+&lt;/figure></description></item><item><title>Solving the Vehicle Routing Problem with genetic algorithms</title><link>https://matteodegobbi.github.io/p/solving-the-vehicle-routing-problem-with-genetic-algorithms/</link><pubDate>Sat, 18 May 2024 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/solving-the-vehicle-routing-problem-with-genetic-algorithms/</guid><description>&lt;img src="https://matteodegobbi.github.io/misc/vrp.jpg" alt="Featured image of post Solving the Vehicle Routing Problem with genetic algorithms" />&lt;h2 id="capacitated-vehicle-routing-problem">Capacitated vehicle routing problem
+&lt;/h2>&lt;p>This semester during the artificial intelligence course I developed a programming project to learn more about genetic algorithms.&lt;/p>
+&lt;p>I set out to solve the capacitated vehicle routing problem, which is an extenstion of the traveling salesman problem where there are multiple salesmen/trucks that need to deliver some products from a storage facility to clients.&lt;/p>
+&lt;p>Each client requests some amount of goods and the trucks have a maximum capacity of goods they can transport. Also the routes of the trucks need to not have any client in common. The objective is to determine the minimum number of trucks necessary to satisfy all the clients and find their routes such that the total number of kilometers travelled is minimized.&lt;/p>
+&lt;p>This is a well known problem in the field of operations research and is very important for the logistics of transportation.&lt;/p>
+&lt;p>Finding the optimal solution is hard especially for big numbers of clients, even a number of clients in the hundreds makes finding the optimal solution using ILP solvers infeasible. For this reason heuristic approaches are often used to solve instances of this problem, in particular some options are:&lt;/p>
+&lt;ul>
+&lt;li>Tabu Search&lt;/li>
+&lt;li>Simulated Annealing&lt;/li>
+&lt;li>Iterated Local Search&lt;/li>
+&lt;li>Genetic Algorithm&lt;/li>
+&lt;/ul>
+&lt;p>I decided to use genetic algorithms, I used as genetic operators:&lt;/p>
+&lt;ul>
+&lt;li>Partially mapped crossover&lt;/li>
+&lt;li>Alternating edge crossover&lt;/li>
+&lt;li>Elitism, meaning the best chromosome always survives)&lt;/li>
+&lt;li>Random mutation, randomly swapping two genes with a small probability&lt;/li>
+&lt;/ul>
+&lt;p>I was able to find good solutions close to the optimal, and in general much better solutions than a greedy approach that always selects the closest client as the next stop for the truck.&lt;/p>
+&lt;p>Also to increase performance of the algorithm I used the library numba which uses a jit compiler to optimize functions when using type hints.&lt;/p>
+&lt;figure>
+&lt;figcaption>Comparison of a bad and good solution to a VRP instance&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/misc/bad_vrp.jpg" style="width:500px;" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/misc/good_vrp.jpg" style="width:500px;" alt="Image 1">
+&lt;/figure></description></item><item><title>Dataset Inference attacks for Generative Adversarial Networks 🤖</title><link>https://matteodegobbi.github.io/p/dataset-inference-attacks-for-generative-adversarial-networks/</link><pubDate>Mon, 16 Oct 2023 02:06:54 +0200</pubDate><guid>https://matteodegobbi.github.io/p/dataset-inference-attacks-for-generative-adversarial-networks/</guid><description>&lt;img src="https://matteodegobbi.github.io/gan.png" alt="Featured image of post Dataset Inference attacks for Generative Adversarial Networks 🤖" />&lt;p>In my bachelor&amp;rsquo;s thesis I explored the idea of membership inference attacks, where we try to determine whether a given sample was present in the training set of a neural network without having access to the weights of the neural network itself. In particular I targeted Generative Adversarial Networks where the training data can contain sensitive information, especially in the medical setting, in forensics and criminal justice.&lt;/p>
+&lt;p>The full thesis can be found at: &lt;a class="link" href="https://thesis.unipd.it/handle/20.500.12608/57083" target="_blank" rel="noopener"
+>https://thesis.unipd.it/handle/20.500.12608/57083&lt;/a>&lt;/p>
+&lt;h2 id="abstract">Abstract:
+&lt;/h2>&lt;p>Generative Adversarial Networks (GANs) have had great success in the generation of artifical samples from datasets made of sensitive data which can&amp;rsquo;t be disclosed publicly. These GANs, if released to the public, could allow an attacker to leak sensitive information from the GAN&amp;rsquo;s training dataset. We analize a type of attack called Membership Inference Attack (MIA), which consists of determining the membership of a certain sample to the training set of the GAN. We analize the success of both black box and white box Membership Inference Attacks on GANs trained on MNIST and anime faces. We look for a relationship between the precision of the attacks and the several hyperparameters of the GANs such as: amount of images in the training set, number of epochs of training, quality of generated images, number of generated images available to the attacker. We show how an insufficient number of training images or an excessive number of training epochs causes overfitting in the GAN, which is then vulnerable to MIAs. We analize how the Fréchet&amp;rsquo;s Inception Distance (FID) between the set of generated images and the original training set impacts on the success of the MIAs.&lt;/p></description></item></channel></rss>

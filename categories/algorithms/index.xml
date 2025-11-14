@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Algorithms on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/categories/algorithms/</link><description>Recent content in Algorithms on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 18 May 2024 01:27:57 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/categories/algorithms/index.xml" rel="self" type="application/rss+xml"/><item><title>Solving the Vehicle Routing Problem with genetic algorithms</title><link>https://matteodegobbi.github.io/p/solving-the-vehicle-routing-problem-with-genetic-algorithms/</link><pubDate>Sat, 18 May 2024 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/solving-the-vehicle-routing-problem-with-genetic-algorithms/</guid><description>&lt;img src="https://matteodegobbi.github.io/misc/vrp.jpg" alt="Featured image of post Solving the Vehicle Routing Problem with genetic algorithms" />&lt;h2 id="capacitated-vehicle-routing-problem">Capacitated vehicle routing problem
+&lt;/h2>&lt;p>This semester during the artificial intelligence course I developed a programming project to learn more about genetic algorithms.&lt;/p>
+&lt;p>I set out to solve the capacitated vehicle routing problem, which is an extenstion of the traveling salesman problem where there are multiple salesmen/trucks that need to deliver some products from a storage facility to clients.&lt;/p>
+&lt;p>Each client requests some amount of goods and the trucks have a maximum capacity of goods they can transport. Also the routes of the trucks need to not have any client in common. The objective is to determine the minimum number of trucks necessary to satisfy all the clients and find their routes such that the total number of kilometers travelled is minimized.&lt;/p>
+&lt;p>This is a well known problem in the field of operations research and is very important for the logistics of transportation.&lt;/p>
+&lt;p>Finding the optimal solution is hard especially for big numbers of clients, even a number of clients in the hundreds makes finding the optimal solution using ILP solvers infeasible. For this reason heuristic approaches are often used to solve instances of this problem, in particular some options are:&lt;/p>
+&lt;ul>
+&lt;li>Tabu Search&lt;/li>
+&lt;li>Simulated Annealing&lt;/li>
+&lt;li>Iterated Local Search&lt;/li>
+&lt;li>Genetic Algorithm&lt;/li>
+&lt;/ul>
+&lt;p>I decided to use genetic algorithms, I used as genetic operators:&lt;/p>
+&lt;ul>
+&lt;li>Partially mapped crossover&lt;/li>
+&lt;li>Alternating edge crossover&lt;/li>
+&lt;li>Elitism, meaning the best chromosome always survives)&lt;/li>
+&lt;li>Random mutation, randomly swapping two genes with a small probability&lt;/li>
+&lt;/ul>
+&lt;p>I was able to find good solutions close to the optimal, and in general much better solutions than a greedy approach that always selects the closest client as the next stop for the truck.&lt;/p>
+&lt;p>Also to increase performance of the algorithm I used the library numba which uses a jit compiler to optimize functions when using type hints.&lt;/p>
+&lt;figure>
+&lt;figcaption>Comparison of a bad and good solution to a VRP instance&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/misc/bad_vrp.jpg" style="width:500px;" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/misc/good_vrp.jpg" style="width:500px;" alt="Image 1">
+&lt;/figure></description></item></channel></rss>

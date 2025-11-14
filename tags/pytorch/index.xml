@@ -15,14 +15,19 @@ The pretraining dataset can be found at: &lt;a class="link" href="https://zenodo
 The code can be found at: &lt;a class="link" href="https://github.com/matteodegobbi/InsectClassification" target="_blank" rel="noopener"
 >https://github.com/matteodegobbi/InsectClassification&lt;/a>&lt;br>
 Paper: &lt;a class="link" href="https://www.mdpi.com/1999-4893/18/2/105" target="_blank" rel="noopener"
->https://www.mdpi.com/1999-4893/18/2/105&lt;/a>\&lt;/p></description></item><item><title>Cave Descent reinforcement learning game</title><link>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/cave-descent-reinforcement-learning-game/img.png" alt="Featured image of post Cave Descent reinforcement learning game" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
+>https://www.mdpi.com/1999-4893/18/2/105&lt;/a>\&lt;/p></description></item><item><title>Reinforcement learning agent for Cave Descent game at HackUPC 2025</title><link>https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/img.png" alt="Featured image of post Reinforcement learning agent for Cave Descent game at HackUPC 2025" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
 >HackUPC 2025&lt;/a>, an hackhathon organized by FIB in Barcelona.&lt;/p>
 &lt;p>Together with &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
 >Vojtěch&lt;/a>, we built a reinforcement learning agent that learns to play a game similar to Geometry Dash&amp;rsquo;s rocket section.
 The agent is trained using deep Q-Learning and we built the game using pygame.&lt;/p>
+&lt;p>We managed to get in the top 5 and present our work in front of everyone 😁!&lt;/p>
 &lt;p>Devpost: &lt;a class="link" href="https://devpost.com/software/rocket-deep-reinforcement-learning" target="_blank" rel="noopener"
 >https://devpost.com/software/rocket-deep-reinforcement-learning&lt;/a>&lt;br>
 Code: &lt;a class="link" href="https://github.com/matteodegobbi/CaveDescentRL" target="_blank" rel="noopener"
 >https://github.com/matteodegobbi/CaveDescentRL&lt;/a>&lt;br>
 Vojtěch&amp;rsquo;s webiste: &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
->https://vojtechbestak.cz/&lt;/a>\&lt;/p></description></item></channel></rss>
+>https://vojtechbestak.cz/&lt;/a>\&lt;/p>
+&lt;figure>
+&lt;figcaption>Me and Vojtěch explaining our project&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/misc/hack.jpg" style="width:500px;" alt="Image 1">
+&lt;/figure></description></item></channel></rss>

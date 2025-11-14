@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Experiences on Matteo De Gobbi</title><link>https://matteodegobbi.github.io/categories/experiences/</link><description>Recent content in Experiences on Matteo De Gobbi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 18 Jun 2025 02:06:47 +0200</lastBuildDate><atom:link href="https://matteodegobbi.github.io/categories/experiences/index.xml" rel="self" type="application/rss+xml"/><item><title>First place winner of AI Pro Competition 🏆</title><link>https://matteodegobbi.github.io/p/first-place-winner-of-ai-pro-competition/</link><pubDate>Wed, 18 Jun 2025 02:06:47 +0200</pubDate><guid>https://matteodegobbi.github.io/p/first-place-winner-of-ai-pro-competition/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/first-place-winner-of-ai-pro-competition/cnosso.jpg" alt="Featured image of post First place winner of AI Pro Competition 🏆" />&lt;p>This June I took part in the Digital Skills Cup AI Pro 2025, an online trivia competition about AI and Deep Learning hosted by LLPA. I got first place in the national qualification and then I also got first place in the world competition!&lt;/p>
+&lt;p>I won a prize of 3000$ to use to travel abroad fully paid by LLPA.&lt;/p>
+&lt;p>I visited Crete with my girlfriend, we had a lot of fun and it was a very entertaining experience participating in this competition.&lt;/p>
+&lt;p>Linkedin post about the competition: &lt;a class="link" href="https://www.linkedin.com/feed/update/urn:li:activity:7355870715205533698/" target="_blank" rel="noopener"
+>https://www.linkedin.com/feed/update/urn:li:activity:7355870715205533698/&lt;/a>&lt;/p>
+&lt;figure>
+&lt;img src="https://matteodegobbi.github.io/llpa_crete/grotta.jpg" style="width:800px;" alt="Image 1">
+&lt;img src="https://matteodegobbi.github.io/llpa_crete/spiaggia.jpg" style="width:600px;" alt="Image 1">
+&lt;/figure></description></item><item><title>Reinforcement learning agent for Cave Descent game at HackUPC 2025</title><link>https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/</link><pubDate>Sun, 15 Jun 2025 01:27:57 +0200</pubDate><guid>https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/</guid><description>&lt;img src="https://matteodegobbi.github.io/p/reinforcement-learning-agent-for-cave-descent-game-at-hackupc-2025/img.png" alt="Featured image of post Reinforcement learning agent for Cave Descent game at HackUPC 2025" />&lt;p>This May I partecipatd at &lt;a class="link" href="https://hackupc.com/" target="_blank" rel="noopener"
+>HackUPC 2025&lt;/a>, an hackhathon organized by FIB in Barcelona.&lt;/p>
+&lt;p>Together with &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
+>Vojtěch&lt;/a>, we built a reinforcement learning agent that learns to play a game similar to Geometry Dash&amp;rsquo;s rocket section.
+The agent is trained using deep Q-Learning and we built the game using pygame.&lt;/p>
+&lt;p>We managed to get in the top 5 and present our work in front of everyone 😁!&lt;/p>
+&lt;p>Devpost: &lt;a class="link" href="https://devpost.com/software/rocket-deep-reinforcement-learning" target="_blank" rel="noopener"
+>https://devpost.com/software/rocket-deep-reinforcement-learning&lt;/a>&lt;br>
+Code: &lt;a class="link" href="https://github.com/matteodegobbi/CaveDescentRL" target="_blank" rel="noopener"
+>https://github.com/matteodegobbi/CaveDescentRL&lt;/a>&lt;br>
+Vojtěch&amp;rsquo;s webiste: &lt;a class="link" href="https://vojtechbestak.cz/" target="_blank" rel="noopener"
+>https://vojtechbestak.cz/&lt;/a>\&lt;/p>
+&lt;figure>
+&lt;figcaption>Me and Vojtěch explaining our project&lt;/figcaption>
+&lt;img src="https://matteodegobbi.github.io/misc/hack.jpg" style="width:500px;" alt="Image 1">
+&lt;/figure></description></item><item><title>Fall School BUCA 2024 🍂</title><link>https://matteodegobbi.github.io/p/fall-school-buca-2024/</link><pubDate>Tue, 15 Oct 2024 02:06:54 +0200</pubDate><guid>https://matteodegobbi.github.io/p/fall-school-buca-2024/</guid><description>&lt;img src="https://matteodegobbi.github.io/sanservolo.jpeg" alt="Featured image of post Fall School BUCA 2024 🍂" />&lt;p>During the Summer school BOOST 24 I attended in Bologna (&lt;a class="link" href="https://matteodegobbi.github.io/p/summer-school-boost-2024/" >Read the BOOST post here&lt;/a>
+) professor Alessandro Panconesi told us about a fall school he would be attending later this year called BUCA 24, in which engineers from Google would be giving lectures about various interesting topics. I decided to apply and I got accepted!&lt;/p>
+&lt;p>During this fall school we stayed in the beautiful island of San Servolo in Venice and we attended lectures about various techniqes that are used at Google to make their products better:&lt;/p>
+&lt;ul>
+&lt;li>Speculation, caching and LoRA in Transformers based deep learning models&lt;/li>
+&lt;li>Load Balancing with consistent hashing&lt;/li>
+&lt;li>System design to ensure reliability and efficiency of systems with billions of users&lt;/li>
+&lt;li>Paxos algorithms for consensus in distributed systems&lt;/li>
+&lt;/ul>
+&lt;p>The lectures were held by:&lt;/p>
+&lt;ul>
+&lt;li>Dan Ardelean, Area Tech Lead for Search Infrastructure, VP of Engineering at Google&lt;/li>
+&lt;li>JJ Furman, engineer at Google and the founder and creator of Megastore, the storage system used by Gmail and Drive&lt;/li>
+&lt;li>Amer Diwan, Area Tech Lead for Performance and Capacity for Search Infrastructure at Google&lt;/li>
+&lt;/ul>
+&lt;p>Website of BUCA: &lt;a class="link" href="https://buca24.bici.events/instructors" target="_blank" rel="noopener"
+>https://buca24.bici.events/instructors&lt;/a>&lt;/p></description></item><item><title>Summer school BOOST 2024</title><link>https://matteodegobbi.github.io/p/summer-school-boost-2024/</link><pubDate>Wed, 18 Sep 2024 02:06:52 +0200</pubDate><guid>https://matteodegobbi.github.io/p/summer-school-boost-2024/</guid><description>&lt;img src="https://matteodegobbi.github.io/boost.jpg" alt="Featured image of post Summer school BOOST 2024" />&lt;p>In the summer of 2024 I got invited by one of my university professors to partecipate in the summer school BOOST24 held in Bologna, in this eleven days we attended many lectures by professors coming from universities all over the world.&lt;/p>
+&lt;p>My favourite lectures I attended at BOOST were:&lt;/p>
+&lt;h3 id="hilbert-gödel-turing-computers--from-sapienza-università-di-roma">&lt;strong>Hilbert, Gödel, Turing: Computers &amp;lsquo;R&amp;rsquo; Us by professor Alessandro Panconesi&lt;/strong> from Sapienza Università di Roma.
+&lt;/h3>&lt;p>In this series of lectures professor Panconesi went over the historical context behind the Hilbert Program, the project birthed in the 1900s by David Hilbert that tried to formalize the whole of mathematics starting from a finite complete set of fundamental axioms. Then the lecturer explained to us the negative answers that proved Hilbert&amp;rsquo;s program impossible: Turing&amp;rsquo;s answer to the Entscheidungsproblem and Godel&amp;rsquo;s incompleteness theorem. These lectures were incredibly interesting and showed us how much mathematics has changed in the last 100 years. These lectures also sparked many interesting conversation at dinner time with the other students attending.&lt;/p>
+&lt;h3 id="machine-learning-for-the-rest-of-us-by-professor-keshav-pingali-from-university-of-texas-at-austin">&lt;strong>Machine Learning for the Rest of Us by professor Keshav Pingali&lt;/strong> from University of Texas at Austin.
+&lt;/h3>&lt;p>Professor Pingali explained to us reinforcement learning starting from the very basics of ML, Deep Learning and finally arriving to reinforcement learning. Explaining Markov Decision Processes and how to solve the full RL problem, taking the point of view of optimal control.&lt;/p>
+&lt;p>Webpage of BOOST 24: &lt;a class="link" href="https://boost24.elicsir.it/home" target="_blank" rel="noopener"
+>https://boost24.elicsir.it/home&lt;/a>&lt;/p></description></item></channel></rss>
